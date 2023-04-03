@@ -2,7 +2,7 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Sign up / Login Form</title>
+  <title>PHP Game Sign up / Login Form</title>
 </head>
 <body>
 <!DOCTYPE html>

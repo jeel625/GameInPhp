@@ -36,24 +36,22 @@ class ConnectingToDatabase
 
     function verifyConnection($connection)
     {
-        //Attempt to connect to the Database
-        $check_connect_to_db = mysqli_select_db($connection, 'finalprojectgame'); //repeat-1
-        //If connection to the Database failed create the database
-        if ($check_connect_to_db === FALSE) {
-            //SQL query
-            $sql_create_db = "CREATE DATABASE finalprojectgame";
-            //Execute the query
-            $create_db = $connection->query($sql_create_db); //repeat-2
-            //If the Database creation failed display an error message  
-            if ($create_db === FALSE)
-                die("Attempt to create the DB failed!<br/>" . $connection->error);
-            //If the Database creation succeed connect to it
-            else {
-                $check_connect_to_db = mysqli_select_db($connection, 'finalprojectgame'); //repeat-1
-                //If connection to the database created failed display an error message
-                if ($check_connect_to_db === FALSE)
-                    die("Connection to the DB failed!<br/> " . $connection->error);
-            }
+        //Attempt to connect to the 
+        
+        try{
+            $check_connect_to_db = mysqli_select_db($connection, 'finalprojectgame');
+        }
+        catch(Exception){
+                $sql_create_db = "CREATE DATABASE finalprojectgame";
+                $create_db = $connection->query($sql_create_db); 
+                if ($create_db === FALSE)
+                    die("Attempt to create the DB failed!<br/>" . $connection->error);
+                else {
+                    $check_connect_to_db = mysqli_select_db($connection, 'finalprojectgame'); //repeat-1
+    
+                    if ($check_connect_to_db === FALSE)
+                        die("Connection to the DB failed!<br/> " . $connection->error);
+                    }
         }
     }
 
@@ -185,38 +183,28 @@ class ConnectingToDatabase
     }
     function connectTable($connection)
     {
-        $flag=false;
         try 
         {
-            $sql_desc_table = "DESC login";
-            $check_table_exists = $connection->query($sql_desc_table); 
-            if ($check_table_exists === FALSE) 
-            {
-                $sql_create_table = "CREATE TABLE login(
-                                                        id int NOT NULL AUTO_INCREMENT, 
-                                                        UserName varchar(50) not null, 
-                                                        TempPassword varchar(50) not null, 
-                                                        LastName varchar(55) NOT NULL, 
-                                                        FirstName varchar(55) not null,
-                                                        Email varchar(50) not null,
-                                                        result int default 'Incomplete',
-                                                        numberOfLives int DEFAULT 6,
-                                                        dateAndTime date null,
-                                                        PRIMARY KEY (id) 
-                CHARACTER SET utf8 COLLATE utf8_general_ci;";
-                        $create_table = $connection->query($sql_create_table); 
-                        
-                if ($create_table === FALSE)
-                    die("Creation of the Table users failed!<br>" . $connection->error);
-                else
-                    $flag=true;
-            }
+            $sql_desc_table = "DESC login ";
+            $connection->query($sql_desc_table); 
         } 
         catch (mysqli_sql_exception $e) 
         {
-            echo "There is Error Regarding creation of tables";
+            $sql_create_table = "CREATE TABLE login(
+                id int NOT NULL AUTO_INCREMENT, 
+                UserName varchar(50) not null, 
+                TempPassword varchar(50) not null, 
+                LastName varchar(55) NOT NULL, 
+                FirstName varchar(55) not null,
+                Email varchar(50) not null,
+                result varchar(50) default 'Incomplete',
+                numberOfLives int DEFAULT 6,
+                dateAndTime date null,
+                PRIMARY KEY (id) 
+                )CHARACTER SET utf8 COLLATE utf8_general_ci;";
+
+            $connection->query($sql_create_table); 
         }
-        return $flag?true:false;
     }
     function checkingNames()
     {
@@ -257,7 +245,7 @@ class ConnectingToDatabase
     }
 }
 
-if (isset($_POST['send'])) {
+if(isset($_POST['send'])) {
     ?>
     <!DOCTYPE html>
     <html>
@@ -278,7 +266,7 @@ if (isset($_POST['send'])) {
 $connection = new mysqli('localhost', 'root', '');
 
 $database = new ConnectingToDatabase($_POST['UserName'], $_POST['TempPassword'],$_POST['ConfirmPassword'],$_POST['LastName'],$_POST['FirstName'],$_POST['Email']);
-$database->getDatabaseConnectionUser();
+
 $database->verifyConnection($connection);
 $database->connectTable($connection);
 if($database->checkingNames() && $database->checkingPassword())
@@ -287,8 +275,7 @@ if($database->checkingNames() && $database->checkingPassword())
     $select_query = $database->selectUsers($connection);
     $select_query->close();
     $connection->close();
-}
-?>
+    echo<<<_END
         <div style = "text-align:center;margin-top:1.5rem;"id="back">
         <?php
         echo<<<_END
@@ -313,11 +300,13 @@ if($database->checkingNames() && $database->checkingPassword())
                 </style>
                 </head>
                 </html>
-        _END;
-        ?>
-            <a href="../../index.php"><input type="submit" value="Login!"></a>
+    _END;
+            echo "<a href='../../index.php'><input type='submit' value='Login!'></a>";
+}
+    echo<<<_END
         </div>
     </div>
 </body>
-
 </html>
+_END;
+?>
