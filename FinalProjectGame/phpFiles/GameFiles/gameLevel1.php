@@ -110,20 +110,12 @@ else
     $randomString=$_POST['randomString'];
 
 
-    // for($i=0;$i<count($randomString);$i++)
-    // {
-    //     echo $randomString[$i]."    ";
-    // }
+
 
     echo "<br>";
     $input_letters=$_POST['userInput'];
     $input_letters = explode(',', $input_letters);
 
-    //for($i=0;$i<count($input_letters);$i++)
-    //{
-    //    echo $input_letters[$i]."    ";
-    //}
-    //echo "<br>";
     
     
     if(isLettersInAscList($randomString,$input_letters))
